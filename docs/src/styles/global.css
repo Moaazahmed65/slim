@@ -26,7 +26,7 @@
   }
 
   :root {
-    --max-width: 620px;
+    --max-width: 760px;
     --padding-x: 24px;
   }
 
@@ -37,7 +37,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
-    scroll-padding-top: 56px;
+    scroll-padding-top: 70px;
   }
 
   body {
@@ -61,5 +61,24 @@
 
   img {
     max-width: 100%;
+  }
+
+  main section {
+    position: relative;
+  }
+
+  main section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  main section#install::before {
+    display: none;
   }
 }

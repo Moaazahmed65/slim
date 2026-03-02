@@ -1,12 +1,9 @@
 ---
 import CommandsSection from '../components/commands-section.astro';
-import DoctorSection from '../components/doctor-section.astro';
-import FeaturesSection from '../components/features-section.astro';
 import HeroSection from '../components/hero-section.astro';
-import HowSection from '../components/how-section.astro';
-import InstallSection from '../components/install-section.astro';
-import PathRoutingSection from '../components/path-routing-section.astro';
-import ProjectConfigSection from '../components/project-config-section.astro';
+import HighlightsSection from '../components/highlights-section.astro';
+import LocalDomainsSection from '../components/local-domains-section.astro';
+import PublicUrlsSection from '../components/public-urls-section.astro';
 import SiteFooter from '../components/site-footer.astro';
 import SiteHeader from '../components/site-header.astro';
 import Layout from '../layouts/layout.astro';
@@ -16,13 +13,10 @@ import Layout from '../layouts/layout.astro';
   <SiteHeader />
   <main>
     <HeroSection />
-    <InstallSection />
-    <FeaturesSection />
+    <LocalDomainsSection />
+    <PublicUrlsSection />
     <CommandsSection />
-    <ProjectConfigSection />
-    <PathRoutingSection />
-    <DoctorSection />
-    <HowSection />
+    <HighlightsSection />
   </main>
   <SiteFooter />
 </Layout>

@@ -1,25 +1,147 @@
 ---
-import TerminalDemo from './terminal-demo.astro';
+import CopyButton from './copy-button.astro';
+
+const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
 ---
 
-<section class="mt-[22px] pt-12 text-center max-sm:pt-9">
-  <div class="max-w-[var(--max-width)] mx-auto px-[var(--padding-x)]">
+<section class="py-11 text-left max-sm:py-7" id="install">
+  <div class="max-w-(--max-width) mx-auto px-(--padding-x) text-center">
+
     <h1 class="font-heading text-[42px] font-semibold leading-[1.15] tracking-[-0.03em] text-text max-sm:text-[28px]">
-      Pretty domains for<br />local development
+      Develop locally with<br />.local & public domains
     </h1>
-    <p class="text-[15px] leading-[1.6] text-text-secondary mx-auto mb-8 mt-3 max-w-[460px] max-sm:text-sm">
-      Map <code class="bg-[#f5f5f5] px-1.5 py-0.5 rounded text-[13px] text-text">localhost:3000</code> to <code class="bg-[#f5f5f5] px-1.5 py-0.5 rounded text-[13px] text-text">https://myapp.local</code> with path routing,
-      HTTPS, WebSocket passthrough, and zero config.
+    <p class="text-[15px] leading-[1.6] text-text-secondary mt-6 mb-9 max-w-115 max-sm:text-sm mx-auto">
+      Turn <code class="bg-[#f5f5f5] px-1.5 py-0.5 rounded text-[13px] text-text">localhost:3000</code> into <code class="bg-[#f5f5f5] px-1.5 py-0.5 rounded text-[13px] text-text">https://app.local</code> with HTTPS, or get a public url without deployment.
     </p>
 
-    <TerminalDemo />
+    <div class="flex gap-0 mb-0">
+      <button
+        class="hero-tab rounded-t-lg px-4 py-2 text-[13px] font-medium transition-colors bg-code-bg text-white"
+        data-hero-tab="local"
+        type="button"
+      >Local Domains</button>
+      <button
+        class="hero-tab rounded-t-lg px-4 py-2 text-[13px] font-medium transition-colors bg-[#e8e8e8] text-text-tertiary hover:text-text-secondary"
+        data-hero-tab="share"
+        type="button"
+      >Internet Sharing</button>
+    </div>
 
-    <div class="flex items-center justify-center gap-2.5 mt-6 pb-1.5">
-      <span class="text-xs text-text-tertiary tracking-[0.01em]">macOS & Linux</span>
-      <span class="text-[#bbb] text-sm">&middot;</span>
-      <span class="text-xs text-text-tertiary tracking-[0.01em]">Single Binary</span>
-      <span class="text-[#bbb] text-sm">&middot;</span>
-      <span class="text-xs text-text-tertiary tracking-[0.01em]">Zero Config</span>
+    <div class="rounded-b-[10px] rounded-tr-[10px] bg-code-bg text-left overflow-hidden">
+      <div class="hero-panel" data-hero-panel="local">
+        <div class="px-4 py-7 font-mono text-[13px] leading-[1.7] text-code-text max-sm:text-[11.5px]">
+          <div class="flex gap-2">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> start web <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://web.local</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+          </div>
+
+          <div class="flex gap-2 mt-3">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> start myapp <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#a78bfa]">--route</span> <span class="text-[#fbbf24]">/api=8080</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.local</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.local/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
+          </div>
+
+          <div class="flex gap-2 mt-3">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> up <span class="text-[#525252]">&nbsp;# .slim.yaml</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.local</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.local/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://dashboard.local</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:5173</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-panel hidden" data-hero-panel="share">
+        <div class="px-4 py-7 font-mono text-[13px] leading-[1.7] text-code-text max-sm:text-[11.5px]">
+          <div class="flex gap-2">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://r4nd0m.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+          </div>
+
+          <div class="flex gap-2 mt-3">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#a78bfa]">--subdomain</span> <span class="text-[#fbbf24]">demo</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://demo.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+          </div>
+
+          <div class="flex gap-2 mt-3">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">8080</span> <span class="text-[#a78bfa]">--password</span> <span class="text-[#a78bfa]">--ttl</span> <span class="text-[#fbbf24]">30m</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://a1b2c3.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#a78bfa]">password protected</span> <span class="text-[#525252]">&middot;</span> <span class="text-[#fbbf24]">expires in 30m</span>
+          </div>
+
+          <div class="flex gap-2 mt-3">
+            <span class="text-[#10b981] select-none">$</span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">4321</span> <span class="text-[#a78bfa]">--subdomain</span> <span class="text-[#fbbf24]">staging</span> <span class="text-[#a78bfa]">--ttl</span> <span class="text-[#fbbf24]">2h</span></span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://staging.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:4321</span>
+          </div>
+          <div class="pl-4 whitespace-nowrap">
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">expires in 2h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-left">
+      <p class="text-[13px] font-medium text-text mt-6 mb-2">Install with one command</p>
+      <div class="bg-code-bg rounded-lg px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
+        <code class="font-mono text-[12.5px] text-[#a3a3a3] whitespace-nowrap flex-1">
+          <span class="text-[#10b981] mr-1.5">$</span> <span class="text-[#7dd3fc]">curl</span> <span class="text-[#a78bfa]">-sL</span> <span class="text-[#34d399]">https://slim.sh/install.sh</span> | <span class="text-[#7dd3fc]">sh</span>
+        </code>
+        <CopyButton text={installCmd} />
+      </div>
+      <p class="text-[12.5px] text-text-tertiary mt-2 leading-normal">
+        Or <a href="https://github.com/kamranahmedse/slim#build-from-source" class="text-text-tertiary underline underline-offset-2 transition-colors hover:text-text-secondary">build from source</a>.
+      </p>
     </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll('.hero-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var target = tab.getAttribute('data-hero-tab');
+
+      document.querySelectorAll('.hero-tab').forEach(function (t) {
+        t.classList.remove('bg-code-bg', 'text-white', 'hover:text-white');
+        t.classList.add('bg-[#e8e8e8]', 'text-text-tertiary');
+      });
+      tab.classList.remove('bg-[#e8e8e8]', 'text-text-tertiary');
+      tab.classList.add('bg-code-bg', 'text-white', 'hover:text-white');
+
+      document.querySelectorAll('.hero-panel').forEach(function (p) {
+        p.classList.add('hidden');
+      });
+      var panel = document.querySelector('.hero-panel[data-hero-panel="' + target + '"]');
+      if (panel) {
+        panel.classList.remove('hidden');
+      }
+    });
+  });
+</script>

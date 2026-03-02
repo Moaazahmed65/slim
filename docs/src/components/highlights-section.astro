@@ -1,8 +1,52 @@
 ---
+import FeatureRow from './feature-row.astro';
 import HowStep from './how-step.astro';
+import ShieldCheck from '../icons/shield-check.astro';
+import Bolt from '../icons/bolt.astro';
+import Globe from '../icons/globe.astro';
+import FileText from '../icons/file-text.astro';
+import Activity from '../icons/activity.astro';
+import TerminalPrompt from '../icons/terminal-prompt.astro';
+import Route from '../icons/route.astro';
+import Folder from '../icons/folder.astro';
 ---
 
-<section class="pt-11">
+<section class="py-11" id="highlights">
+  <div class="max-w-[var(--max-width)] mx-auto px-[var(--padding-x)]">
+    <h2 class="font-heading text-[22px] font-semibold tracking-[-0.02em] mb-1.5 text-text max-sm:text-xl">Features</h2>
+    <p class="text-text-tertiary text-sm mb-4 leading-[1.5]">
+      Everything you need for local development, built into a single binary.
+    </p>
+    <div class="flex flex-col">
+      <FeatureRow title="Automatic HTTPS" description="Trusted certificates, green lock, no warnings.">
+        <ShieldCheck />
+      </FeatureRow>
+      <FeatureRow title="WebSocket & HMR" description="Next.js, Vite, and others work out of the box.">
+        <Bolt />
+      </FeatureRow>
+      <FeatureRow title="Multiple Domains" description="Each gets its own certificate and proxy.">
+        <Globe />
+      </FeatureRow>
+      <FeatureRow title="Access Logging" description="Full, minimal, or off. Tail and filter by domain.">
+        <FileText />
+      </FeatureRow>
+      <FeatureRow title="Health Monitoring" description="See which upstreams are reachable at a glance.">
+        <Activity />
+      </FeatureRow>
+      <FeatureRow title="Path Routing" description="Route different URL paths to different upstream ports.">
+        <Route />
+      </FeatureRow>
+      <FeatureRow title="Project Config" description="Share your dev setup with teammates via .slim.yaml.">
+        <Folder />
+      </FeatureRow>
+      <FeatureRow title="Zero Config" description="First run handles CA, trust, and port forwarding.">
+        <TerminalPrompt />
+      </FeatureRow>
+    </div>
+  </div>
+</section>
+
+<section class="py-11">
   <div class="max-w-[var(--max-width)] mx-auto px-[var(--padding-x)]">
     <h2 class="font-heading text-[22px] font-semibold tracking-[-0.02em] mb-1.5 text-text max-sm:text-xl">How it works</h2>
     <p class="text-text-tertiary text-sm mb-4 leading-[1.5]">
