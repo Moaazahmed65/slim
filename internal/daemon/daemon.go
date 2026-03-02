@@ -93,17 +93,8 @@ func run() error {
 
 	srv := proxy.NewServer(cfg)
 
-	responder := newMDNSResponder()
-	if err := responder.refreshNetworkInfo(); err != nil {
-		log.Error("mDNS: failed to enumerate network interfaces: %v", err)
-	}
-	for _, d := range cfg.Domains {
-		if err := responder.register(d.Name, d.Port); err != nil {
-			log.Error("mDNS registration failed for %s: %v", d.Name, err)
-		}
-	}
 	ipc, err := NewIPCServer(func(req Request) Response {
-		return handleIPC(req, srv, responder)
+		return handleIPC(req, srv)
 	})
 	if err != nil {
 		return err
@@ -117,7 +108,6 @@ func run() error {
 	var cleanupOnce sync.Once
 	cleanup := func() {
 		cleanupOnce.Do(func() {
-			responder.shutdown()
 			ipc.Close()
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
@@ -139,7 +129,7 @@ func run() error {
 	return srv.Start()
 }
 
-func handleIPC(req Request, srv *proxy.Server, responder *mdnsResponder) Response {
+func handleIPC(req Request, srv *proxy.Server) Response {
 	switch req.Type {
 	case MsgShutdown:
 		go func() {
@@ -152,7 +142,7 @@ func handleIPC(req Request, srv *proxy.Server, responder *mdnsResponder) Respons
 		return handleStatus()
 
 	case MsgReload:
-		return handleReload(srv, responder)
+		return handleReload(srv)
 
 	default:
 		return Response{OK: false, Error: fmt.Sprintf("unknown message type: %s", req.Type)}
@@ -199,23 +189,13 @@ func handleStatus() Response {
 	return Response{OK: true, Data: data}
 }
 
-func handleReload(srv *proxy.Server, responder *mdnsResponder) Response {
+func handleReload(srv *proxy.Server) Response {
 	cfg, err := srv.ReloadConfig()
 	if err != nil {
 		return Response{OK: false, Error: err.Error()}
 	}
 	if err := log.SetOutput(config.LogPath(), cfg.EffectiveLogMode()); err != nil {
 		return Response{OK: false, Error: err.Error()}
-	}
-
-	responder.shutdown()
-	if err := responder.refreshNetworkInfo(); err != nil {
-		log.Error("mDNS: failed to enumerate network interfaces: %v", err)
-	}
-	for _, d := range cfg.Domains {
-		if err := responder.register(d.Name, d.Port); err != nil {
-			log.Error("mDNS registration failed for %s: %v", d.Name, err)
-		}
 	}
 	return Response{OK: true}
 }

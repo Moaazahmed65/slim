@@ -11,7 +11,7 @@ import (
 )
 
 func TestHandleIPCUnknownMessage(t *testing.T) {
-	resp := handleIPC(Request{Type: MessageType("unknown")}, &proxy.Server{}, newMDNSResponder())
+	resp := handleIPC(Request{Type: MessageType("unknown")}, &proxy.Server{})
 	if resp.OK {
 		t.Fatalf("expected failure for unknown message, got %+v", resp)
 	}

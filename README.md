@@ -156,7 +156,6 @@ slim uninstall   # removes everything: CA, certs, hosts entries, port-forward ru
 - **HTTPS**: A root CA is generated on first use and trusted in the system trust store (macOS Keychain or Linux CA store). Per-domain leaf certificates are created on demand and served via SNI.
 - **Reverse proxy**: Go's `httputil.ReverseProxy` handles HTTP/2, WebSocket upgrades, and CORS natively — HMR for Next.js, Vite, etc. works out of the box.
 - **Local resolution**: `/etc/hosts` entries are managed automatically.
-- **LAN discovery**: Optional mDNS (Bonjour/Avahi) service announcements can help discover running apps on the local network.
 - **Port forwarding**: macOS `pfctl` or Linux `iptables` redirects ports 80/443 to unprivileged 10080/10443 so the proxy doesn't need root.
 - **Daemon**: The proxy runs in the background. `start` launches it automatically, `stop` shuts it down.
 
