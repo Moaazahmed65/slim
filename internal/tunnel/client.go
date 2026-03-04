@@ -115,8 +115,12 @@ func (c *Client) readLoop(ctx context.Context, conn *websocket.Conn) {
 			return
 		}
 
-		if websocket.CloseStatus(err) == 4000 {
+		switch websocket.CloseStatus(err) {
+		case 4000:
 			log.Info("tunnel expired (TTL reached)")
+			return
+		case 4001:
+			log.Info("tunnel was dropped")
 			return
 		}
 

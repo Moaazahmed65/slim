@@ -221,6 +221,17 @@ var domainVerifyCmd = &cobra.Command{
 						return "", fmt.Errorf("%s", msg)
 					}
 
+					var result struct {
+						Domain domainEntry `json:"domain"`
+					}
+					if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+						return "done", nil
+					}
+
+					if !result.Domain.Verified {
+						return "", fmt.Errorf("DNS records not found for %s — make sure your A record points to the correct IP", domain)
+					}
+
 					return "done", nil
 				},
 			},
