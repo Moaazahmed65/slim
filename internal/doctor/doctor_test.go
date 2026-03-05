@@ -41,17 +41,24 @@ func setupDoctorTest(t *testing.T) func() {
 	}
 }
 
-type mockPortFwd struct{ enabled bool }
+type mockPortFwd struct {
+	enabled bool
+	loaded  bool
+}
 
-func (m *mockPortFwd) Enable() error  { return nil }
-func (m *mockPortFwd) Disable() error { return nil }
-func (m *mockPortFwd) IsEnabled() bool { return m.enabled }
+func (m *mockPortFwd) Enable() error       { return nil }
+func (m *mockPortFwd) Disable() error      { return nil }
+func (m *mockPortFwd) IsEnabled() bool      { return m.enabled }
+func (m *mockPortFwd) IsLoaded() bool       { return m.loaded }
+func (m *mockPortFwd) EnsureLoaded() error  { return nil }
 
 func TestCheckPortForwarding(t *testing.T) {
 	restore := setupDoctorTest(t)
 	defer restore()
 
-	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: true} }
+	daemonIsRunningFn = func() bool { return true }
+
+	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: true, loaded: true} }
 	r := checkPortForwarding()
 	if r.Status != Pass {
 		t.Fatalf("expected Pass, got %v: %s", r.Status, r.Message)
@@ -61,6 +68,12 @@ func TestCheckPortForwarding(t *testing.T) {
 	r = checkPortForwarding()
 	if r.Status != Warn {
 		t.Fatalf("expected Warn, got %v: %s", r.Status, r.Message)
+	}
+
+	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: true, loaded: false} }
+	r = checkPortForwarding()
+	if r.Status != Fail {
+		t.Fatalf("expected Fail for enabled but not loaded, got %v: %s", r.Status, r.Message)
 	}
 }
 
@@ -167,7 +180,7 @@ func TestRun(t *testing.T) {
 	configLoadFn = func() (*config.Config, error) { return cfg, nil }
 	readFileFn = func(path string) ([]byte, error) { return nil, os.ErrNotExist }
 	daemonIsRunningFn = func() bool { return false }
-	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: false} }
+	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: false, loaded: false} }
 
 	report := Run()
 	if len(report.Results) == 0 {

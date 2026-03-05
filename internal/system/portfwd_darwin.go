@@ -4,9 +4,11 @@ package system
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/kamranahmedse/slim/internal/config"
 )
@@ -79,7 +81,65 @@ func (d *darwinPortFwd) Enable() error {
 		return fmt.Errorf("loading pfctl rules: %s: %w", strings.TrimSpace(string(output)), err)
 	}
 
+	_ = os.WriteFile(pfStampPath(), []byte{}, 0644)
 	return nil
+}
+
+func (d *darwinPortFwd) EnsureLoaded() error {
+	if d.loadedSinceBoot() {
+		return nil
+	}
+
+	if output, err := exec.Command("sudo", "pfctl", "-e").CombinedOutput(); err != nil {
+		out := strings.TrimSpace(string(output))
+		if !isPFAlreadyEnabledOutput(out) {
+			return fmt.Errorf("enabling pfctl: %s: %w", out, err)
+		}
+	}
+
+	cmd := exec.Command("sudo", "pfctl", "-f", "/etc/pf.conf")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("loading pfctl rules: %s: %w", strings.TrimSpace(string(output)), err)
+	}
+
+	_ = os.WriteFile(pfStampPath(), []byte{}, 0644)
+	return nil
+}
+
+func pfStampPath() string {
+	return config.Dir() + "/pf-loaded"
+}
+
+func (d *darwinPortFwd) loadedSinceBoot() bool {
+	info, err := os.Stat(pfStampPath())
+	if err != nil {
+		return false
+	}
+
+	out, err := exec.Command("sysctl", "-n", "kern.boottime").Output()
+	if err != nil {
+		return false
+	}
+
+	// Output format: { sec = 1709654321, usec = 0 } Thu Mar  5 ...
+	s := string(out)
+	start := strings.Index(s, "sec = ")
+	if start < 0 {
+		return false
+	}
+	s = s[start+6:]
+	end := strings.Index(s, ",")
+	if end < 0 {
+		return false
+	}
+
+	var bootSec int64
+	if _, err := fmt.Sscanf(s[:end], "%d", &bootSec); err != nil {
+		return false
+	}
+	bootTime := time.Unix(bootSec, 0)
+	return info.ModTime().After(bootTime)
 }
 
 func (d *darwinPortFwd) Disable() error {
@@ -114,6 +174,21 @@ func (d *darwinPortFwd) Disable() error {
 func (d *darwinPortFwd) IsEnabled() bool {
 	_, err := os.Stat(anchorFile)
 	return err == nil
+}
+
+func (d *darwinPortFwd) IsLoaded() bool {
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", config.ProxyHTTPSPort), 1*time.Second)
+	if err != nil {
+		return false
+	}
+	conn.Close()
+
+	conn, err = net.DialTimeout("tcp", "127.0.0.1:443", 1*time.Second)
+	if err != nil {
+		return false
+	}
+	conn.Close()
+	return true
 }
 
 func isPFAlreadyEnabledOutput(out string) bool {

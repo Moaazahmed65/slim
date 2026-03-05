@@ -53,6 +53,10 @@ func (l *linuxPortFwd) Enable() error {
 	return nil
 }
 
+func (l *linuxPortFwd) EnsureLoaded() error {
+	return l.Enable()
+}
+
 func (l *linuxPortFwd) Disable() error {
 	if !commandExistsLinuxFn("iptables") {
 		return nil
@@ -78,6 +82,10 @@ func (l *linuxPortFwd) Disable() error {
 		return fmt.Errorf("deleting chain %s: %s: %w", linuxChainName, strings.TrimSpace(string(output)), err)
 	}
 	return nil
+}
+
+func (l *linuxPortFwd) IsLoaded() bool {
+	return l.IsEnabled()
 }
 
 func (l *linuxPortFwd) IsEnabled() bool {

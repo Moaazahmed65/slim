@@ -76,6 +76,12 @@ Runs first-time setup automatically if needed.
 		}
 
 		if !daemon.IsRunning() {
+			pf := system.NewPortForwarder()
+			if pf.IsEnabled() {
+				if err := pf.EnsureLoaded(); err != nil {
+					return fmt.Errorf("loading port forwarding rules: %w", err)
+				}
+			}
 			if err := setup.EnsureProxyPortsAvailable(); err != nil {
 				return err
 			}

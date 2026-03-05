@@ -100,10 +100,13 @@ func checkCATrust() CheckResult {
 func checkPortForwarding() CheckResult {
 	name := "Port forwarding"
 	pf := newPortFwdFn()
-	if pf.IsEnabled() {
-		return CheckResult{Name: name, Status: Pass, Message: fmt.Sprintf("active (80→%d, 443→%d)", config.ProxyHTTPPort, config.ProxyHTTPSPort)}
+	if !pf.IsEnabled() {
+		return CheckResult{Name: name, Status: Warn, Message: "not configured"}
 	}
-	return CheckResult{Name: name, Status: Warn, Message: "not active"}
+	if daemonIsRunningFn() && !pf.IsLoaded() {
+		return CheckResult{Name: name, Status: Fail, Message: fmt.Sprintf("configured but rules not loaded (run: sudo pfctl -f /etc/pf.conf)")}
+	}
+	return CheckResult{Name: name, Status: Pass, Message: fmt.Sprintf("active (80→%d, 443→%d)", config.ProxyHTTPPort, config.ProxyHTTPSPort)}
 }
 
 func checkHostsFile(domain string) CheckResult {
