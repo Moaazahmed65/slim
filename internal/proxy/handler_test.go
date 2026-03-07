@@ -23,7 +23,7 @@ func TestBuildHandlerRoutesKnownDomain(t *testing.T) {
 	port := mustPortFromURL(t, upstream.URL)
 	s := &Server{
 		cfg:    &config.Config{},
-		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport())}},
+		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport(), false)}},
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "https://myapp.test/health?x=1", nil)
@@ -73,7 +73,7 @@ func TestBuildHandlerUpstreamDownReturnsBadGateway(t *testing.T) {
 	port := freeTCPPort(t)
 	s := &Server{
 		cfg:    &config.Config{},
-		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport())}},
+		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport(), false)}},
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "https://myapp.test/", nil)
@@ -92,14 +92,14 @@ func TestBuildHandlerUpstreamDownReturnsBadGateway(t *testing.T) {
 
 func TestDomainRouterMatch(t *testing.T) {
 	transport := newUpstreamTransport()
-	proxy := newDomainProxy(3000, transport)
+	proxy := newDomainProxy(3000, transport, false)
 	router := &domainRouter{
 		defaultPort:    3000,
 		defaultHandler: proxy,
 		pathRoutes: []pathRoute{
-			{prefix: "/api/v2", port: 9090, handler: http.StripPrefix("/api/v2", newDomainProxy(9090, transport))},
-			{prefix: "/api", port: 8080, handler: http.StripPrefix("/api", newDomainProxy(8080, transport))},
-			{prefix: "/ws", port: 9000, handler: http.StripPrefix("/ws", newDomainProxy(9000, transport))},
+			{prefix: "/api/v2", port: 9090, handler: http.StripPrefix("/api/v2", newDomainProxy(9090, transport, false))},
+			{prefix: "/api", port: 8080, handler: http.StripPrefix("/api", newDomainProxy(8080, transport, false))},
+			{prefix: "/ws", port: 9000, handler: http.StripPrefix("/ws", newDomainProxy(9000, transport, false))},
 		},
 	}
 
@@ -141,9 +141,9 @@ func TestPathRouteStripsPrefix(t *testing.T) {
 		routes: map[string]*domainRouter{
 			"myapp": {
 				defaultPort:    3000,
-				defaultHandler: newDomainProxy(3000, newUpstreamTransport()),
+				defaultHandler: newDomainProxy(3000, newUpstreamTransport(), false),
 				pathRoutes: []pathRoute{
-					{prefix: "/api", port: apiPort, handler: http.StripPrefix("/api", newDomainProxy(apiPort, newUpstreamTransport()))},
+					{prefix: "/api", port: apiPort, handler: http.StripPrefix("/api", newDomainProxy(apiPort, newUpstreamTransport(), false))},
 				},
 			},
 		},
@@ -173,6 +173,95 @@ func TestPathRouteStripsPrefix(t *testing.T) {
 		default:
 			t.Errorf("request %s: upstream was not called", tt.reqPath)
 		}
+	}
+}
+
+func TestCORSHeadersNotAddedByDefault(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://example.com")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+
+	port := mustPortFromURL(t, upstream.URL)
+	s := &Server{
+		cfg:    &config.Config{},
+		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport(), false)}},
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "https://myapp.test/api", nil)
+	req.Host = "myapp.test"
+	req.Header.Set("Origin", "http://example.com")
+	rr := httptest.NewRecorder()
+
+	buildHandler(s).ServeHTTP(rr, req)
+
+	origins := rr.Result().Header.Values("Access-Control-Allow-Origin")
+	if len(origins) != 1 {
+		t.Fatalf("expected 1 Access-Control-Allow-Origin header, got %d: %v", len(origins), origins)
+	}
+	if origins[0] != "http://example.com" {
+		t.Fatalf("expected origin %q, got %q", "http://example.com", origins[0])
+	}
+}
+
+func TestCORSEnabledStripsUpstreamHeaders(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://example.com")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+
+	port := mustPortFromURL(t, upstream.URL)
+	s := &Server{
+		cfg:    &config.Config{Cors: true},
+		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport(), true)}},
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "https://myapp.test/api", nil)
+	req.Host = "myapp.test"
+	req.Header.Set("Origin", "http://example.com")
+	rr := httptest.NewRecorder()
+
+	buildHandler(s).ServeHTTP(rr, req)
+
+	origins := rr.Result().Header.Values("Access-Control-Allow-Origin")
+	if len(origins) != 1 {
+		t.Fatalf("expected 1 Access-Control-Allow-Origin header, got %d: %v", len(origins), origins)
+	}
+
+	methods := rr.Result().Header.Values("Access-Control-Allow-Methods")
+	if len(methods) != 1 {
+		t.Fatalf("expected 1 Access-Control-Allow-Methods header, got %d: %v", len(methods), methods)
+	}
+
+	creds := rr.Result().Header.Values("Access-Control-Allow-Credentials")
+	if len(creds) != 1 {
+		t.Fatalf("expected 1 Access-Control-Allow-Credentials header, got %d: %v", len(creds), creds)
+	}
+}
+
+func TestCORSEnabledHandlesPreflight(t *testing.T) {
+	s := &Server{
+		cfg:    &config.Config{Cors: true},
+		routes: map[string]*domainRouter{"myapp": {defaultPort: 3000, defaultHandler: newDomainProxy(3000, newUpstreamTransport(), true)}},
+	}
+
+	req := httptest.NewRequest(http.MethodOptions, "https://myapp.test/api", nil)
+	req.Host = "myapp.test"
+	req.Header.Set("Origin", "http://example.com")
+	rr := httptest.NewRecorder()
+
+	buildHandler(s).ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNoContent {
+		t.Fatalf("expected %d for OPTIONS preflight, got %d", http.StatusNoContent, rr.Code)
+	}
+	if rr.Result().Header.Get("Access-Control-Allow-Origin") != "http://example.com" {
+		t.Fatalf("expected CORS origin header on preflight response")
 	}
 }
 

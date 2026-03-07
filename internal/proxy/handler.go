@@ -45,17 +45,20 @@ func buildHandler(s *Server) http.Handler {
 
 		s.cfgMu.RLock()
 		router, found := s.routes[name]
+		cors := s.cfg.Cors
 		s.cfgMu.RUnlock()
 		if !found {
 			http.NotFound(w, r)
 			return
 		}
 
-		if origin := r.Header.Get("Origin"); origin != "" {
-			setCORSHeaders(w, origin)
-			if r.Method == http.MethodOptions {
-				w.WriteHeader(http.StatusNoContent)
-				return
+		if cors {
+			if origin := r.Header.Get("Origin"); origin != "" {
+				setCORSHeaders(w, origin)
+				if r.Method == http.MethodOptions {
+					w.WriteHeader(http.StatusNoContent)
+					return
+				}
 			}
 		}
 
@@ -76,13 +79,13 @@ func setCORSHeaders(w http.ResponseWriter, origin string) {
 	w.Header().Set("Access-Control-Max-Age", "86400")
 }
 
-func newDomainProxy(port int, transport *http.Transport) *httputil.ReverseProxy {
+func newDomainProxy(port int, transport *http.Transport, cors bool) *httputil.ReverseProxy {
 	target := &url.URL{
 		Scheme: "http",
 		Host:   fmt.Sprintf("localhost:%d", port),
 	}
 
-	return &httputil.ReverseProxy{
+	proxy := &httputil.ReverseProxy{
 		Transport: transport,
 		Rewrite: func(pr *httputil.ProxyRequest) {
 			pr.SetURL(target)
@@ -97,6 +100,23 @@ func newDomainProxy(port int, transport *http.Transport) *httputil.ReverseProxy 
 			})
 		},
 	}
+
+	if cors {
+		proxy.ModifyResponse = stripCORSHeaders
+	}
+
+	return proxy
+}
+
+func stripCORSHeaders(resp *http.Response) error {
+	h := resp.Header
+	h.Del("Access-Control-Allow-Origin")
+	h.Del("Access-Control-Allow-Methods")
+	h.Del("Access-Control-Allow-Headers")
+	h.Del("Access-Control-Allow-Credentials")
+	h.Del("Access-Control-Max-Age")
+	h.Del("Access-Control-Expose-Headers")
+	return nil
 }
 
 func normalizeHost(host string) string {

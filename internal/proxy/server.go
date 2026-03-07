@@ -231,14 +231,14 @@ func (s *Server) applyConfig(cfg *config.Config) error {
 
 		router := &domainRouter{
 			defaultPort:    d.Port,
-			defaultHandler: newDomainProxy(d.Port, s.transport),
+			defaultHandler: newDomainProxy(d.Port, s.transport, cfg.Cors),
 		}
 
 		for _, r := range d.Routes {
 			router.pathRoutes = append(router.pathRoutes, pathRoute{
 				prefix:  r.Path,
 				port:    r.Port,
-				handler: http.StripPrefix(r.Path, newDomainProxy(r.Port, s.transport)),
+				handler: http.StripPrefix(r.Path, newDomainProxy(r.Port, s.transport, cfg.Cors)),
 			})
 		}
 		sort.Slice(router.pathRoutes, func(i, j int) bool {

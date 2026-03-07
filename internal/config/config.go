@@ -33,6 +33,7 @@ type Domain struct {
 type Config struct {
 	Domains []Domain `yaml:"domains"`
 	LogMode string   `yaml:"log_mode,omitempty"`
+	Cors    bool     `yaml:"cors,omitempty"`
 }
 
 func ValidateRoute(path string, port int) error {

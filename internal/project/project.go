@@ -25,6 +25,7 @@ type Service struct {
 type ProjectConfig struct {
 	Services []Service `yaml:"services"`
 	LogMode  string    `yaml:"log_mode,omitempty"`
+	Cors     bool      `yaml:"cors,omitempty"`
 }
 
 func Find() (string, error) {

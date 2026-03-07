@@ -70,6 +70,7 @@ then start all services defined in it.
 			if err != nil {
 				return err
 			}
+			cfg.Cors = pc.Cors
 			if pc.LogMode != "" {
 				cfg.LogMode = strings.ToLower(strings.TrimSpace(pc.LogMode))
 			}
@@ -101,7 +102,7 @@ then start all services defined in it.
 
 		if !upDaemonIsChildFn() {
 			pf := upNewPortFwdFn()
-			if pf.IsEnabled() && !pf.IsLoaded() {
+			if shouldReloadPortForwarding(pf, upDaemonIsRunningFn()) {
 				if err := pf.EnsureLoaded(); err != nil {
 					return fmt.Errorf("loading port forwarding rules: %w", err)
 				}
@@ -121,6 +122,15 @@ then start all services defined in it.
 		} else {
 			if _, err := upDaemonSendIPCFn(daemon.Request{Type: daemon.MsgReload}); err != nil {
 				return fmt.Errorf("reloading daemon: %w", err)
+			}
+		}
+
+		if !upDaemonIsChildFn() {
+			pf := upNewPortFwdFn()
+			if shouldReloadPortForwarding(pf, true) {
+				if err := pf.EnsureLoaded(); err != nil {
+					return fmt.Errorf("loading port forwarding rules: %w", err)
+				}
 			}
 		}
 
