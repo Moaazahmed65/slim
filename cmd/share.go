@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -79,6 +80,31 @@ var shareCmd = &cobra.Command{
 
 		url, err := client.Connect(ctx)
 		if err != nil {
+			errMsg := err.Error()
+			if strings.Contains(errMsg, "Pro subscription") {
+				var feature string
+				switch {
+				case subdomain != "":
+					feature = "Custom subdomains"
+				case shareDomain != "":
+					feature = "Custom domains"
+				case password != "":
+					feature = "Password protection"
+				default:
+					feature = "This feature"
+				}
+
+				fmt.Printf("\n%s %s requires a Pro subscription.\n", term.CrossMark, feature)
+				fmt.Printf("  Upgrade at: https://app.slim.sh/settings/billing\n\n")
+				fmt.Printf("  Free:\n")
+				fmt.Printf("  %s\n", term.Dim.Render(fmt.Sprintf("slim share --port %d", port)))
+				fmt.Printf("  %s\n\n", term.Dim.Render(fmt.Sprintf("slim share --port %d --ttl 30m", port)))
+				fmt.Printf("  Pro:\n")
+				fmt.Printf("  %s\n", term.Dim.Render(fmt.Sprintf("slim share --port %d --subdomain myapp", port)))
+				fmt.Printf("  %s\n", term.Dim.Render(fmt.Sprintf("slim share --port %d --domain myapp.com", port)))
+				fmt.Printf("  %s\n\n", term.Dim.Render(fmt.Sprintf("slim share --port %d --password secret", port)))
+				return nil
+			}
 			return fmt.Errorf("tunnel connection failed: %w", err)
 		}
 
